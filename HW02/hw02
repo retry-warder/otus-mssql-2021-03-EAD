@@ -1,0 +1,188 @@
+/*
+1. Все товары, в названии которых есть "urgent" или название начинается с "Animal".
+Вывести: ИД товара (StockItemID), наименование товара (StockItemName).
+Таблицы: Warehouse.StockItems.
+*/
+
+TODO: 
+SELECT [StockItemID],[StockItemName] FROM [WideWorldImporters].[Warehouse].[StockItems]
+WHERE [StockItemName] LIKE '%urgent%' or [StockItemName] LIKE 'Animal%'
+
+/*
+2. Поставщиков (Suppliers), у которых не было сделано ни одного заказа (PurchaseOrders).
+Сделать через JOIN, с подзапросом задание принято не будет.
+Вывести: ИД поставщика (SupplierID), наименование поставщика (SupplierName).
+Таблицы: Purchasing.Suppliers, Purchasing.PurchaseOrders.
+По каким колонкам делать JOIN подумайте самостоятельно.
+*/
+
+TODO:
+SELECT        Purchasing.Suppliers.SupplierID, Purchasing.Suppliers.SupplierName, Purchasing.PurchaseOrders.PurchaseOrderID
+FROM            Purchasing.Suppliers LEFT OUTER JOIN
+                         Purchasing.PurchaseOrders ON Purchasing.Suppliers.SupplierID = Purchasing.PurchaseOrders.SupplierID
+WHERE        (Purchasing.PurchaseOrders.PurchaseOrderID IS NULL)
+
+/*
+3. Заказы (Orders) с ценой товара (UnitPrice) более 100$ 
+либо количеством единиц (Quantity) товара более 20 штук
+и присутствующей датой комплектации всего заказа (PickingCompletedWhen).
+Вывести:
+* OrderID
+* дату заказа (OrderDate) в формате ДД.ММ.ГГГГ
+* название месяца, в котором был сделан заказ
+* номер квартала, в котором был сделан заказ
+* треть года, к которой относится дата заказа (каждая треть по 4 месяца)
+* имя заказчика (Customer)
+Добавьте вариант этого запроса с постраничной выборкой,
+пропустив первую 1000 и отобразив следующие 100 записей.
+
+Сортировка должна быть по номеру квартала, трети года, дате заказа (везде по возрастанию).
+
+Таблицы: Sales.Orders, Sales.OrderLines, Sales.Customers.
+*/
+SELECT 
+DISTINCT
+Sales.Orders.OrderID, Sales.Orders.OrderDate, FORMAT(Sales.Orders.OrderDate, 'dd.MM.yyyy') AS [ДАТА В ФОРМАТЕ ДД.ММ.ГГГГ], DATEPART(M, Sales.Orders.OrderDate) AS КВАРТАЛ, DATENAME(MONTH, 
+                         Sales.Orders.OrderDate) AS [НАЗВАНИЕ МЕСЯЦА], CASE WHEN MONTH(Sales.Orders.OrderDate) BETWEEN 1 AND 4 THEN 1 WHEN MONTH(Sales.Orders.OrderDate) BETWEEN 5 AND 
+                         8 THEN 2 WHEN MONTH(Sales.Orders.OrderDate) BETWEEN 9 AND 12 THEN 3 END AS [ТРЕТЬ ГОДА], Sales.Customers.CustomerName
+FROM            Sales.Orders INNER JOIN
+                         Sales.OrderLines ON Sales.OrderLines.OrderID = Sales.Orders.OrderID AND (Sales.OrderLines.Quantity > 20 OR
+                         Sales.OrderLines.UnitPrice > 100) 
+						 AND (Sales.Orders.PickingCompletedWhen IS NOT NULL) INNER JOIN
+                         Sales.Customers ON Sales.Orders.CustomerID = Sales.Customers.CustomerID
+ORDER BY Sales.Orders.OrderDate, КВАРТАЛ, [ТРЕТЬ ГОДА]
+GO
+SELECT 
+DISTINCT
+Sales.Orders.OrderID, Sales.Orders.OrderDate, FORMAT(Sales.Orders.OrderDate, 'dd.MM.yyyy') AS [ДАТА В ФОРМАТЕ ДД.ММ.ГГГГ], DATEPART(M, Sales.Orders.OrderDate) AS КВАРТАЛ, DATENAME(MONTH, 
+                         Sales.Orders.OrderDate) AS [НАЗВАНИЕ МЕСЯЦА], CASE WHEN MONTH(Sales.Orders.OrderDate) BETWEEN 1 AND 4 THEN 1 WHEN MONTH(Sales.Orders.OrderDate) BETWEEN 5 AND 
+                         8 THEN 2 WHEN MONTH(Sales.Orders.OrderDate) BETWEEN 9 AND 12 THEN 3 END AS [ТРЕТЬ ГОДА], Sales.Customers.CustomerName
+FROM            Sales.Orders INNER JOIN
+                         Sales.OrderLines ON Sales.OrderLines.OrderID = Sales.Orders.OrderID AND (Sales.OrderLines.Quantity > 20 OR
+                         Sales.OrderLines.UnitPrice > 100) 
+						 AND (Sales.Orders.PickingCompletedWhen IS NOT NULL) INNER JOIN
+                         Sales.Customers ON Sales.Orders.CustomerID = Sales.Customers.CustomerID
+ORDER BY Sales.Orders.OrderDate, КВАРТАЛ, [ТРЕТЬ ГОДА]
+OFFSET 1000 ROWS FETCH FIRST 100 ROWS ONLY;
+
+/*
+4. Заказы поставщикам (Purchasing.Suppliers),
+которые должны быть исполнены (ExpectedDeliveryDate) в январе 2013 года
+с доставкой "Air Freight" или "Refrigerated Air Freight" (DeliveryMethodName)
+и которые исполнены (IsOrderFinalized).
+Вывести:
+* способ доставки (DeliveryMethodName)
+* дата доставки (ExpectedDeliveryDate)
+* имя поставщика
+* имя контактного лица принимавшего заказ (ContactPerson)
+
+Таблицы: Purchasing.Suppliers, Purchasing.PurchaseOrders, Application.DeliveryMethods, Application.People.
+*/
+
+SELECT        Application.DeliveryMethods.DeliveryMethodName, Purchasing.PurchaseOrders.ExpectedDeliveryDate, Purchasing.Suppliers.SupplierName, Application.People.FullName AS ContactPerson
+                         
+FROM            Purchasing.PurchaseOrders INNER JOIN
+                         Purchasing.Suppliers ON Purchasing.PurchaseOrders.SupplierID = Purchasing.Suppliers.SupplierID AND Purchasing.PurchaseOrders.SupplierID = Purchasing.Suppliers.SupplierID INNER JOIN
+                         Application.People ON Purchasing.PurchaseOrders.ContactPersonID = Application.People.PersonID INNER JOIN
+                         Application.DeliveryMethods ON Purchasing.PurchaseOrders.DeliveryMethodID = Application.DeliveryMethods.DeliveryMethodID AND 
+                         Purchasing.PurchaseOrders.DeliveryMethodID = Application.DeliveryMethods.DeliveryMethodID
+						 AND Application.DeliveryMethods.DeliveryMethodName IN ('Air Freight','Refrigerated Air Freight')
+WHERE Purchasing.PurchaseOrders.IsOrderFinalized = 1
+
+/*
+5. Десять последних продаж (по дате продажи) с именем клиента и именем сотрудника,
+который оформил заказ (SalespersonPerson).
+Сделать без подзапросов.
+*/
+
+SELECT        TOP (10) Sales.Invoices.InvoiceID, Sales.Customers.CustomerName, Application.People.FullName
+FROM            Sales.Invoices INNER JOIN
+                         Sales.Customers ON Sales.Invoices.CustomerID = Sales.Customers.CustomerID INNER JOIN
+                         Application.People ON Sales.Invoices.SalespersonPersonID = Application.People.PersonID
+ORDER BY Sales.Invoices.InvoiceDate DESC
+
+/*
+6. Все ид и имена клиентов и их контактные телефоны,
+которые покупали товар "Chocolate frogs 250g".
+Имя товара смотреть в таблице Warehouse.StockItems.
+*/
+
+SELECT distinct Sales.Customers.CustomerName, Sales.Invoices.CustomerID, Sales.Customers.PhoneNumber
+FROM            Sales.Invoices INNER JOIN
+                         Sales.Customers ON Sales.Invoices.CustomerID = Sales.Customers.CustomerID INNER JOIN
+                         Sales.InvoiceLines ON Sales.Invoices.InvoiceID = Sales.InvoiceLines.InvoiceID INNER JOIN
+                         Warehouse.StockItems ON Sales.InvoiceLines.StockItemID = Warehouse.StockItems.StockItemID
+WHERE        (Warehouse.StockItems.StockItemName = 'Chocolate frogs 250g')
+
+/*
+7. Посчитать среднюю цену товара, общую сумму продажи по месяцам
+Вывести:
+* Год продажи (например, 2015)
+* Месяц продажи (например, 4)
+* Средняя цена за месяц по всем товарам
+* Общая сумма продаж за месяц
+
+Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
+*/
+
+SELECT     
+YEAR(Sales.Invoices.InvoiceDate) AS [ГОД],
+MONTH(Sales.Invoices.InvoiceDate) AS [МЕСЯЦ],
+AVG(Sales.InvoiceLines.UnitPrice) AS [Средняя цена],
+SUM(Sales.InvoiceLines.Quantity*Sales.InvoiceLines.UnitPrice) AS [Общая сумма продаж]
+FROM            Sales.Invoices INNER JOIN
+                         Sales.InvoiceLines ON Sales.Invoices.InvoiceID = Sales.InvoiceLines.InvoiceID
+GROUP BY
+YEAR(Sales.Invoices.InvoiceDate),
+MONTH(Sales.Invoices.InvoiceDate) 
+
+/*
+8. Отобразить все месяцы, где общая сумма продаж превысила 10 000
+
+Вывести:
+* Год продажи (например, 2015)
+* Месяц продажи (например, 4)
+* Общая сумма продаж
+
+Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
+*/
+
+SELECT     
+YEAR(Sales.Invoices.InvoiceDate) AS [ГОД],
+MONTH(Sales.Invoices.InvoiceDate) AS [МЕСЯЦ],
+SUM(Sales.InvoiceLines.Quantity*Sales.InvoiceLines.UnitPrice) AS [Общая сумма продаж]
+FROM            Sales.Invoices INNER JOIN
+                         Sales.InvoiceLines ON Sales.Invoices.InvoiceID = Sales.InvoiceLines.InvoiceID
+GROUP BY
+YEAR(Sales.Invoices.InvoiceDate),
+MONTH(Sales.Invoices.InvoiceDate) 
+HAVING
+SUM(Sales.InvoiceLines.Quantity*Sales.InvoiceLines.UnitPrice) > 10000
+
+/*
+9. Вывести сумму продаж, дату первой продажи
+и количество проданного по месяцам, по товарам,
+продажи которых менее 50 ед в месяц.
+Группировка должна быть по году,  месяцу, товару.
+
+Вывести:
+* Год продажи
+* Месяц продажи
+* Наименование товара
+* Сумма продаж
+* Дата первой продажи
+* Количество проданного
+
+Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
+*/
+
+SELECT        YEAR(Sales.Invoices.InvoiceDate) AS ГОД, MONTH(Sales.Invoices.InvoiceDate) AS МЕСЯЦ, 
+                         Warehouse.StockItems.StockItemName,
+						 SUM(Sales.InvoiceLines.Quantity * Sales.InvoiceLines.UnitPrice) AS [Общая сумма продаж],
+						 MIN(Sales.Invoices.InvoiceDate) AS [Дата первой продажи],
+						 SUM(Sales.InvoiceLines.Quantity) AS [Количество]
+FROM            Sales.Invoices INNER JOIN
+                         Sales.InvoiceLines ON Sales.Invoices.InvoiceID = Sales.InvoiceLines.InvoiceID INNER JOIN
+                         Warehouse.StockItems ON Sales.InvoiceLines.StockItemID = Warehouse.StockItems.StockItemID
+GROUP BY YEAR(Sales.Invoices.InvoiceDate), MONTH(Sales.Invoices.InvoiceDate), Warehouse.StockItems.StockItemName
+HAVING        (SUM(Sales.InvoiceLines.Quantity) < 50)
