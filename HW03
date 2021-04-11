@@ -1,0 +1,259 @@
+/*
+Домашнее задание по курсу MS SQL Server Developer в OTUS.
+
+Занятие "03 - Подзапросы, CTE, временные таблицы".
+
+Задания выполняются с использованием базы данных WideWorldImporters.
+
+Бэкап БД можно скачать отсюда:
+https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0
+Нужен WideWorldImporters-Full.bak
+
+Описание WideWorldImporters от Microsoft:
+* https://docs.microsoft.com/ru-ru/sql/samples/wide-world-importers-what-is
+* https://docs.microsoft.com/ru-ru/sql/samples/wide-world-importers-oltp-database-catalog
+*/
+
+-- ---------------------------------------------------------------------------
+-- Задание - написать выборки для получения указанных ниже данных.
+-- Для всех заданий, где возможно, сделайте два варианта запросов:
+--  1) через вложенный запрос
+--  2) через WITH (для производных таблиц)
+-- ---------------------------------------------------------------------------
+
+USE WideWorldImporters
+
+/*
+1. Выберите сотрудников (Application.People), которые являются продажниками (IsSalesPerson), 
+и не сделали ни одной продажи 04 июля 2015 года. 
+Вывести ИД сотрудника и его полное имя. 
+Продажи смотреть в таблице Sales.Invoices.
+*/
+
+SELECT PersonID, FullName
+FROM   Application.People
+WHERE  (IsSalesperson = 1)
+AND NOT PersonID IN (SELECT SalespersonPersonID FROM Sales.Invoices WHERE InvoiceDate = '2015-07-04')
+GO
+SELECT PersonID, FullName
+FROM   Application.People
+WHERE  (IsSalesperson = 1)
+AND NOT PersonID = ANY (SELECT SalespersonPersonID FROM Sales.Invoices WHERE InvoiceDate = '2015-07-04')
+GO
+SELECT PersonID, FullName
+FROM   Application.People
+WHERE  (IsSalesperson = 1)
+AND PersonID <> ALL (SELECT SalespersonPersonID FROM Sales.Invoices WHERE InvoiceDate = '2015-07-04')
+GO
+SELECT P.PersonID, P.FullName
+FROM   Application.People AS P
+LEFT JOIN (SELECT SalespersonPersonID AS PersonID FROM Sales.Invoices WHERE InvoiceDate = '2015-07-04') AS S
+ON
+P.PersonID = S.PersonID
+WHERE S.PersonID IS NULL
+AND (P.IsSalesperson = 1)
+GO
+with Sales_CTE AS (SELECT SalespersonPersonID AS PersonID FROM Sales.Invoices WHERE InvoiceDate = '2015-07-04')
+SELECT P.PersonID, P.FullName
+FROM   Application.People AS P
+LEFT JOIN Sales_CTE AS S
+ON
+P.PersonID = S.PersonID
+WHERE S.PersonID IS NULL
+AND (P.IsSalesperson = 1)
+GO
+with Sales_CTE AS (SELECT SalespersonPersonID AS PersonID FROM Sales.Invoices WHERE InvoiceDate = '2015-07-04')
+SELECT PersonID, FullName
+FROM   Application.People
+WHERE  (IsSalesperson = 1)
+AND NOT PersonID = ANY (SELECT PersonID FROM Sales_CTE)
+GO
+with Sales_CTE AS (SELECT SalespersonPersonID AS PersonID FROM Sales.Invoices WHERE InvoiceDate = '2015-07-04')
+SELECT PersonID, FullName
+FROM   Application.People AS P
+WHERE  (IsSalesperson = 1)
+AND NOT EXISTS (SELECT S.PersonID FROM Sales_CTE AS S WHERE S.PersonID = P.PersonID)
+/*
+2. Выберите товары с минимальной ценой (подзапросом). Сделайте два варианта подзапроса. 
+Вывести: ИД товара, наименование товара, цена.
+*/
+
+SELECT StockItemID, StockItemName, UnitPrice
+FROM            Warehouse.StockItems
+WHERE UnitPrice = (SELECT MIN(UnitPrice) FROM Warehouse.StockItems) 
+GO
+SELECT StockItemID, StockItemName, UnitPrice
+FROM            Warehouse.StockItems
+WHERE UnitPrice <= ALL (SELECT UnitPrice FROM Warehouse.StockItems) 
+GO
+with min_price AS (SELECT MIN(UnitPrice) as minprice FROM Warehouse.StockItems)
+SELECT StockItemID, StockItemName, UnitPrice
+FROM Warehouse.StockItems as T
+JOIN min_price as P on T.UnitPrice = P.minprice
+
+/*
+3. Выберите информацию по клиентам, которые перевели компании пять максимальных платежей 
+из Sales.CustomerTransactions. 
+Представьте несколько способов (в том числе с CTE). 
+*/
+
+with VIP_CUSTOMERS AS (
+SELECT TOP 5 CustomerID AS CustomerID, MAX(TransactionAmount) AS TransactionAmount 
+FROM            Sales.CustomerTransactions
+GROUP BY CustomerID
+ORDER BY TransactionAmount DESC)
+SELECT        C.CustomerID, C.CustomerName, VC.TransactionAmount
+FROM            Sales.Customers AS C
+JOIN VIP_CUSTOMERS AS VC ON VC.CustomerID = C.CustomerID
+GO
+SELECT        C.CustomerID, C.CustomerName
+FROM            Sales.Customers AS C
+JOIN (SELECT TOP 5 CustomerID AS CustomerID, MAX(TransactionAmount) AS TransactionAmount 
+FROM            Sales.CustomerTransactions
+GROUP BY CustomerID
+ORDER BY TransactionAmount DESC) AS VC ON VC.CustomerID = C.CustomerID
+
+/*
+4. Выберите города (ид и название), в которые были доставлены товары, 
+входящие в тройку самых дорогих товаров, а также имя сотрудника, 
+который осуществлял упаковку заказов (PackedByPersonID).
+*/
+
+WITH VIP_StockItems as 
+(
+	SELECT TOP 3 StockItems.StockItemID AS ID, StockItems.StockItemName AS ItemName, StockItems.UnitPrice as maxprice 
+	FROM Warehouse.StockItems AS StockItems 
+	ORDER BY StockItems.UnitPrice DESC
+	),
+VIP_StockItems_Invoices as
+(
+SELECT InvoiceID as InvoiceID 
+FROM Sales.InvoiceLines 
+where StockItemID in (select id from VIP_StockItems)
+)
+
+SELECT        Application.Cities.CityID, Application.Cities.CityName, Sales.Invoices.PackedByPersonID, Application.People.FullName
+FROM            Sales.Invoices INNER JOIN
+                         Sales.Customers ON Sales.Invoices.CustomerID = Sales.Customers.CustomerID INNER JOIN
+                         Application.Cities ON Sales.Customers.DeliveryCityID = Application.Cities.CityID INNER JOIN
+                         VIP_StockItems_Invoices ON Sales.Invoices.InvoiceID = VIP_StockItems_Invoices.InvoiceID INNER JOIN
+                         Application.People ON Sales.Invoices.PackedByPersonID = Application.People.PersonID
+GO
+WITH VIP_StockItems as 
+(
+	SELECT TOP 3 StockItems.StockItemID AS ID, StockItems.StockItemName AS ItemName, StockItems.UnitPrice as maxprice 
+	FROM Warehouse.StockItems AS StockItems 
+	ORDER BY StockItems.UnitPrice DESC
+	),
+VIP_StockItems_Invoices as
+(
+SELECT InvoiceID as InvoiceID 
+FROM Sales.InvoiceLines 
+where StockItemID in (select id from VIP_StockItems)
+)
+
+SELECT        
+Sales.Customers.DeliveryCityID, 
+(SELECT Application.Cities.CityName FROM Application.Cities WHERE Application.Cities.CityID = Sales.Customers.DeliveryCityID) AS CityName,
+Sales.Invoices.PackedByPersonID, 
+(SELECT Application.People.FullName FROM Application.People WHERE Application.People.PersonID = Sales.Invoices.PackedByPersonID) AS FullName
+FROM            Sales.Invoices INNER JOIN
+                         Sales.Customers ON Sales.Invoices.CustomerID = Sales.Customers.CustomerID
+						 INNER JOIN
+                         VIP_StockItems_Invoices ON Sales.Invoices.InvoiceID = VIP_StockItems_Invoices.InvoiceID 
+-- ---------------------------------------------------------------------------
+-- Опциональное задание
+-- ---------------------------------------------------------------------------
+-- Можно двигаться как в сторону улучшения читабельности запроса, 
+-- так и в сторону упрощения плана\ускорения. 
+-- Сравнить производительность запросов можно через SET STATISTICS IO, TIME ON. 
+-- Если знакомы с планами запросов, то используйте их (тогда к решению также приложите планы). 
+-- Напишите ваши рассуждения по поводу оптимизации. 
+
+-- 5. Объясните, что делает и оптимизируйте запрос
+
+SELECT 
+	Invoices.InvoiceID, 
+	Invoices.InvoiceDate,
+	(SELECT People.FullName
+		FROM Application.People
+		WHERE People.PersonID = Invoices.SalespersonPersonID
+	) AS SalesPersonName,
+	SalesTotals.TotalSumm AS TotalSummByInvoice, 
+	(SELECT SUM(OrderLines.PickedQuantity*OrderLines.UnitPrice)
+		FROM Sales.OrderLines
+		WHERE OrderLines.OrderId = (SELECT Orders.OrderId 
+			FROM Sales.Orders
+			WHERE Orders.PickingCompletedWhen IS NOT NULL	
+				AND Orders.OrderId = Invoices.OrderId)	
+	) AS TotalSummForPickedItems
+FROM Sales.Invoices 
+	JOIN
+	(SELECT InvoiceId, SUM(Quantity*UnitPrice) AS TotalSumm
+	FROM Sales.InvoiceLines
+	GROUP BY InvoiceId
+	HAVING SUM(Quantity*UnitPrice) > 27000) AS SalesTotals
+		ON Invoices.InvoiceID = SalesTotals.InvoiceID
+ORDER BY TotalSumm DESC
+
+-- --
+
+SELECT 
+	Invoices.InvoiceID, 
+	Invoices.InvoiceDate,
+	(SELECT People.FullName
+		FROM Application.People
+		WHERE People.PersonID = Invoices.SalespersonPersonID
+	) AS SalesPersonName, --ФИО продажника
+	SalesTotals.TotalSumm AS TotalSummByInvoice, 
+	(SELECT SUM(OrderLines.PickedQuantity*OrderLines.UnitPrice)
+		FROM Sales.OrderLines
+		WHERE OrderLines.OrderId = (SELECT Orders.OrderId 
+			FROM Sales.Orders
+			WHERE Orders.PickingCompletedWhen IS NOT NULL	
+				AND Orders.OrderId = Invoices.OrderId)	
+	) AS TotalSummForPickedItems --Выбираем сумму позиций по скомплектованному заказу по данной продаже
+FROM Sales.Invoices 
+	JOIN
+	(SELECT InvoiceId, SUM(Quantity*UnitPrice) AS TotalSumm
+	FROM Sales.InvoiceLines
+	GROUP BY InvoiceId
+	HAVING SUM(Quantity*UnitPrice) > 27000) AS SalesTotals
+		ON Invoices.InvoiceID = SalesTotals.InvoiceID --сумма продажи должна быть больше 27 000
+ORDER BY TotalSumm DESC
+
+--Выбираются продажи  с суммой товаров больше 27 000
+--Выводятся ИД продажи, дата продажи, ФИО продажника, Сумма продажи, Сумма скомплектованных позиций заказа
+
+GO
+with 
+invoices_cte as
+(
+SELECT        Sales.Invoices.InvoiceID as InvoiceID, Sales.Invoices.InvoiceDate as InvoiceDate, SUM(Sales.InvoiceLines.Quantity*Sales.InvoiceLines.UnitPrice) AS TotalSummByInvoice, Sales.Invoices.OrderID AS OrderID, Sales.Invoices.SalespersonPersonID AS SalespersonPersonID
+FROM            Sales.Invoices INNER JOIN
+                         Sales.InvoiceLines ON Sales.Invoices.InvoiceID = Sales.InvoiceLines.InvoiceID AND Sales.Invoices.InvoiceID = Sales.InvoiceLines.InvoiceID
+GROUP BY Sales.Invoices.InvoiceID, Sales.Invoices.InvoiceDate, Sales.Invoices.OrderID, Sales.Invoices.SalespersonPersonID
+HAVING
+SUM(Sales.InvoiceLines.Quantity*Sales.InvoiceLines.UnitPrice)>27000
+),
+orders_PickingCompleted as
+(
+SELECT        Sales.Orders.OrderID, SUM(Sales.OrderLines.UnitPrice*Sales.OrderLines.Quantity) AS TotalSummForPickedItems
+FROM            Sales.Orders INNER JOIN
+                         Sales.OrderLines ON Sales.Orders.OrderID = Sales.OrderLines.OrderID
+				AND Sales.OrderLines.PickingCompletedWhen IS NOT NULL
+GROUP BY Sales.Orders.OrderID
+)
+SELECT
+invoices_cte.InvoiceID, 
+invoices_cte.InvoiceDate, 
+	(SELECT People.FullName
+		FROM Application.People
+		WHERE People.PersonID = invoices_cte.SalespersonPersonID
+	) AS SalesPersonName,
+invoices_cte.TotalSummByInvoice, 
+orders_PickingCompleted.TotalSummForPickedItems
+FROM invoices_cte
+LEFT JOIN orders_PickingCompleted
+ON invoices_cte.OrderID = orders_PickingCompleted.OrderID
+ORDER BY TotalSummByInvoice DESC
