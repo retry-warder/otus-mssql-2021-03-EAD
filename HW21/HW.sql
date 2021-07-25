@@ -18,3 +18,24 @@ INNER JOIN Warehouse.StockItemTransactions AS ItemTrans ON ItemTrans.StockItemID
 GROUP BY T.CustomerID, T.StockItemID ORDER BY T.CustomerID, T.StockItemID
 
 DROP TABLE #ord
+
+--ИЛИ
+
+Select 
+ord.CustomerID, det.StockItemID, SUM(det.UnitPrice), SUM(det.Quantity), COUNT(ord.OrderID)
+FROM 
+Sales.Orders AS ord
+INNER HASH JOIN Sales.OrderLines AS det ON det.OrderID = ord.OrderID 
+INNER JOIN Warehouse.StockItems AS SI ON SI.SupplierId = 12 AND SI.StockItemID = det.StockItemID
+INNER HASH JOIN Sales.Invoices AS Inv  
+ON Inv.OrderID = ord.OrderID
+INNER HASH JOIN Sales.CustomerTransactions AS Trans ON Trans.InvoiceID = Inv.InvoiceID
+INNER HASH JOIN Warehouse.StockItemTransactions AS ItemTrans ON ItemTrans.StockItemID = det.StockItemID
+WHERE
+Inv.BillToCustomerID != ord.CustomerID
+AND
+Inv.InvoiceDate =  ord.OrderDate  --DATEDIFF(dd, Inv.InvoiceDate, ord.OrderDate) убрал т.к. все равно тип данных date, так, что выражение не имеет смысла
+AND
+(SELECT SUM(Total.UnitPrice*Total.Quantity) FROM Sales.OrderLines AS Total INNER HASH JOIN Sales.Orders AS ordTotal On ordTotal.OrderID = Total.OrderID WHERE ordTotal.CustomerID = Inv.CustomerID) > 250000
+GROUP BY ord.CustomerID, det.StockItemID ORDER BY ord.CustomerID, det.StockItemID
+OPTION (MAXDOP 1)
