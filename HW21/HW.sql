@@ -44,7 +44,7 @@ DROP TABLE #CUSTOMERS
 DROP TABLE #PHONE_COMPANY_StockItem
 DROP TABLE #Invoices
 
-ИЛИ
+--ИЛИ--------------------------------------------------------------------------
 
 SELECT ordTotal.CustomerID 
 	INTO #CUSTOMERS
