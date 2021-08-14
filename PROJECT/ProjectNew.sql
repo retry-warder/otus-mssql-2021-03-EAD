@@ -1,15 +1,15 @@
 USE [Accounting of metering devices]
 GO
-/****** Object:  Schema [DOC]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Schema [DOC]    Script Date: 14.08.2021 10:14:03 ******/
 CREATE SCHEMA [DOC]
 GO
-/****** Object:  Schema [LOCATIONS]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Schema [LOCATIONS]    Script Date: 14.08.2021 10:14:03 ******/
 CREATE SCHEMA [LOCATIONS]
 GO
-/****** Object:  Schema [MD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Schema [MD]    Script Date: 14.08.2021 10:14:03 ******/
 CREATE SCHEMA [MD]
 GO
-/****** Object:  UserDefinedFunction [dbo].[GEN_EAN_13]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [dbo].[GEN_EAN_13]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -44,7 +44,7 @@ BEGIN
     RETURN  @barcode + CAST(CHAR(ASCII('0') + @chk_digit) AS nvarchar)
 END
 GO
-/****** Object:  UserDefinedFunction [dbo].[GEN_EAN_13_DOP]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [dbo].[GEN_EAN_13_DOP]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -76,7 +76,7 @@ SET @bc =  @bc + CAST(@chk_digit AS nvarchar)
     RETURN @bc;
 END
 GO
-/****** Object:  UserDefinedFunction [DOC].[GET_Calibration_barcode]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [DOC].[GET_Calibration_barcode]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -95,7 +95,121 @@ BEGIN
 	RETURN @barcode;
 END
 GO
-/****** Object:  UserDefinedFunction [DOC].[GET_Responsible_person_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [DOC].[GET_Calibration_id_by_barcode]    Script Date: 14.08.2021 10:14:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE  FUNCTION [DOC].[GET_Calibration_id_by_barcode]
+(    
+	@barcode	nvarchar(max)
+)
+RETURNS int
+AS
+BEGIN
+	DECLARE @id int;
+	SELECT @id = T.id_calibration FROM [DOC].[Calibration] AS T WHERE T.barcode = @barcode;
+	RETURN @id;
+END
+GO
+/****** Object:  UserDefinedFunction [DOC].[GET_Diagnostic_id_by_barcode]    Script Date: 14.08.2021 10:14:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE  FUNCTION [DOC].[GET_Diagnostic_id_by_barcode]
+(    
+	@barcode	nvarchar(max)
+)
+RETURNS int
+AS
+BEGIN
+	DECLARE @id int;
+	SELECT @id = T.id_diagnostic FROM [DOC].[Diagnostics] AS T WHERE T.barcode = @barcode;
+	RETURN @id;
+END
+GO
+/****** Object:  UserDefinedFunction [DOC].[GET_Disposal_id_by_barcode]    Script Date: 14.08.2021 10:14:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE  FUNCTION [DOC].[GET_Disposal_id_by_barcode]
+(    
+	@barcode	nvarchar(max)
+)
+RETURNS int
+AS
+BEGIN
+	DECLARE @id int;
+	SELECT @id = T.id_disposal FROM [DOC].[Disposal] AS T WHERE T.barcode = @barcode;
+	RETURN @id;
+END
+GO
+/****** Object:  UserDefinedFunction [DOC].[GET_Mounting_id_by_barcode]    Script Date: 14.08.2021 10:14:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE  FUNCTION [DOC].[GET_Mounting_id_by_barcode]
+(    
+	@barcode	nvarchar(max)
+)
+RETURNS int
+AS
+BEGIN
+	DECLARE @id int;
+	SELECT @id = T.id_mounting FROM [DOC].[Mounting] AS T WHERE T.barcode = @barcode;
+	RETURN @id;
+END
+GO
+/****** Object:  UserDefinedFunction [DOC].[GET_Removal_id_by_barcode]    Script Date: 14.08.2021 10:14:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE  FUNCTION [DOC].[GET_Removal_id_by_barcode]
+(    
+	@barcode	nvarchar(max)
+)
+RETURNS int
+AS
+BEGIN
+	DECLARE @id int;
+	SELECT @id = T.id_removal FROM [DOC].[Removal] AS T WHERE T.barcode = @barcode;
+	RETURN @id;
+END
+GO
+/****** Object:  UserDefinedFunction [DOC].[GET_Repair_id_by_barcode]    Script Date: 14.08.2021 10:14:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE  FUNCTION [DOC].[GET_Repair_id_by_barcode]
+(    
+	@barcode	nvarchar(max)
+)
+RETURNS int
+AS
+BEGIN
+	DECLARE @id int;
+	SELECT @id = T.id_repair FROM [DOC].[Repairs] AS T WHERE T.barcode = @barcode;
+	RETURN @id;
+END
+GO
+/****** Object:  UserDefinedFunction [DOC].[GET_Responsible_person_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -117,7 +231,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [DOC].[GET_Supplier_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [DOC].[GET_Supplier_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -139,7 +253,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [DOC].[GET_Type_diagnostic_result_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [DOC].[GET_Type_diagnostic_result_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -161,7 +275,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [DOC].[GET_Type_doc_calibration_result_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [DOC].[GET_Type_doc_calibration_result_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -183,7 +297,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [DOC].[GET_Type_of_repair_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [DOC].[GET_Type_of_repair_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -205,7 +319,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [DOC].[GET_Type_transaction_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [DOC].[GET_Type_transaction_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -227,7 +341,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [DOC].[GET_Types_unserviceability_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [DOC].[GET_Types_unserviceability_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -249,7 +363,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Connection_point_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Connection_point_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -269,7 +383,7 @@ BEGIN
 	RETURN @connection_point;
 END
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Customer_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Customer_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -289,7 +403,7 @@ BEGIN
 	RETURN @customer;
 END
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Delivery_point_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Delivery_point_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -310,7 +424,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Dislocation_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Dislocation_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -350,7 +464,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_ENR_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_ENR_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -371,7 +485,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Installation_site_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Installation_site_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -392,7 +506,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Region_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Region_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -413,7 +527,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Type_accounting_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Type_accounting_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -434,7 +548,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Type_customer_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Type_customer_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -455,7 +569,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [MD].[GET_Descr_Metering_devices_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [MD].[GET_Descr_Metering_devices_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -482,7 +596,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [MD].[GET_Metering_devices_barcode_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [MD].[GET_Metering_devices_barcode_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -500,7 +614,7 @@ BEGIN
 	RETURN @barcode;
 END
 GO
-/****** Object:  UserDefinedFunction [MD].[GET_Metering_devices_id_by_barcode]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [MD].[GET_Metering_devices_id_by_barcode]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -518,7 +632,7 @@ BEGIN
 	RETURN @id;
 END
 GO
-/****** Object:  UserDefinedFunction [MD].[GET_Metering_devices_id_by_serial_number]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [MD].[GET_Metering_devices_id_by_serial_number]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -541,7 +655,7 @@ BEGIN
 	RETURN @id;
 END
 GO
-/****** Object:  UserDefinedFunction [MD].[GET_Model_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [MD].[GET_Model_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -563,7 +677,7 @@ BEGIN
 END
 
 GO
-/****** Object:  UserDefinedFunction [MD].[GET_Type_metering_device_by_id]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [MD].[GET_Type_metering_device_by_id]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -585,7 +699,7 @@ BEGIN
 END
 
 GO
-/****** Object:  Table [DOC].[Types_transactions]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Types_transactions]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -599,7 +713,7 @@ CREATE TABLE [DOC].[Types_transactions](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Mounting]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Mounting]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -620,7 +734,7 @@ CREATE TABLE [DOC].[Mounting](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Removal]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Removal]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -641,7 +755,7 @@ CREATE TABLE [DOC].[Removal](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Calibration]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Calibration]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -669,7 +783,7 @@ CREATE TABLE [DOC].[Calibration](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Diagnostics]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Diagnostics]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -693,7 +807,7 @@ CREATE TABLE [DOC].[Diagnostics](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Repairs]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Repairs]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -718,7 +832,7 @@ CREATE TABLE [DOC].[Repairs](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Disposal]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Disposal]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -737,7 +851,7 @@ CREATE TABLE [DOC].[Disposal](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  View [DOC].[LAST_TRANSACTION_AT_METERING_DEVICES]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  View [DOC].[LAST_TRANSACTION_AT_METERING_DEVICES]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -784,7 +898,7 @@ FROM            DOC.Disposal AS Disposal)
 DOC.Types_transactions AS Types_transactions ON R.id_type_transaction = Types_transactions.id_type_transaction
 WHERE        R.TransactionRank = 1
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_TRANSACTION_LINE_BY_METERIG_DEVICE]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_TRANSACTION_LINE_BY_METERIG_DEVICE]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -850,7 +964,7 @@ SELECT TRANSACTION_LINE.id_metering_device
 FROM TRANSACTION_LINE AS TRANSACTION_LINE
 INNER JOIN [DOC].[Types_transactions] AS TYPES_TRANSACTIONS ON TRANSACTION_LINE.id_type_transaction = TYPES_TRANSACTIONS.id_type_transaction )
 GO
-/****** Object:  Table [LOCATIONS].[Locations_metering_devices]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[Locations_metering_devices]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -871,7 +985,7 @@ CREATE TABLE [LOCATIONS].[Locations_metering_devices](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [MD].[Models]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [MD].[Models]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -886,7 +1000,7 @@ CREATE TABLE [MD].[Models](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [LOCATIONS].[Customers]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[Customers]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -903,7 +1017,7 @@ CREATE TABLE [LOCATIONS].[Customers](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [LOCATIONS].[Regions]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[Regions]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -917,7 +1031,7 @@ CREATE TABLE [LOCATIONS].[Regions](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [LOCATIONS].[ENR]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[ENR]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -931,7 +1045,7 @@ CREATE TABLE [LOCATIONS].[ENR](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [LOCATIONS].[Delivery_points]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[Delivery_points]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -945,7 +1059,7 @@ CREATE TABLE [LOCATIONS].[Delivery_points](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [LOCATIONS].[Installation_sites]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[Installation_sites]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -959,7 +1073,7 @@ CREATE TABLE [LOCATIONS].[Installation_sites](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [LOCATIONS].[Connection_points]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[Connection_points]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -975,7 +1089,7 @@ CREATE TABLE [LOCATIONS].[Connection_points](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [MD].[Metering_devices]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [MD].[Metering_devices]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -998,7 +1112,7 @@ CREATE TABLE [MD].[Metering_devices](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [LOCATIONS].[Types_accounting]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[Types_accounting]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1012,7 +1126,7 @@ CREATE TABLE [LOCATIONS].[Types_accounting](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  View [DOC].[LOCATIONS_METERING_DEVICES]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  View [DOC].[LOCATIONS_METERING_DEVICES]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1101,7 +1215,7 @@ GROUP BY
 	LOCATIONS.id_type_accounting,
 	Types_accounting.type_accounting
 GO
-/****** Object:  View [DOC].[LOCATIONS_METERING_DEVICES_CALIBRATIONS]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  View [DOC].[LOCATIONS_METERING_DEVICES_CALIBRATIONS]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1189,7 +1303,7 @@ FROM
 	ON Metering_devices.id_metering_device = LAST_CALIBRATIONS.id_metering_device) AS Metering_devices
 ON MOUNTING_MD.id_metering_device = Metering_devices.id_metering_device
 GO
-/****** Object:  View [DOC].[ORDERS_ON_CALIBRATIONS]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  View [DOC].[ORDERS_ON_CALIBRATIONS]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1214,7 +1328,7 @@ WITH Orders_on_calibration AS (SELECT        id_metering_device, id_transaction,
                               LOCATIONS.Connection_points AS Connection_points ON Locations_metering_devices.id_connection_point = Connection_points.id_connection_point INNER JOIN
                               LOCATIONS.Types_accounting AS Types_accounting ON Locations_metering_devices.id_type_accounting = Types_accounting.id_type_accounting
 GO
-/****** Object:  Table [DOC].[Suppliers]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Suppliers]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1230,7 +1344,7 @@ CREATE TABLE [DOC].[Suppliers](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Types_doc_calibrations_result]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Types_doc_calibrations_result]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1244,7 +1358,7 @@ CREATE TABLE [DOC].[Types_doc_calibrations_result](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  View [DOC].[FAILED_CALIBRATIONS]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  View [DOC].[FAILED_CALIBRATIONS]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1273,7 +1387,7 @@ WITH Orders_on_calibration AS (SELECT        id_metering_device, id_transaction,
                               DOC.Suppliers AS Suppliers ON Calibration.id_supplier = Suppliers.id_supplier INNER JOIN
                               DOC.Types_doc_calibrations_result AS Types_doc_calibrations_result ON Calibration.id_type_doc_calibration_result = Types_doc_calibrations_result.id_type_doc_calibration_result
 GO
-/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Dislocation_Metering_devices_by_Enr]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [LOCATIONS].[GET_Dislocation_Metering_devices_by_Enr]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1322,7 +1436,7 @@ FROM DOC.Removal as Removal
 ) AS T
 WHERE T.TransactionRank = 1 AND T.id_type_transaction = 0)
 GO
-/****** Object:  UserDefinedFunction [MD].[NEXT_CALIBRATION_MD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  UserDefinedFunction [MD].[NEXT_CALIBRATION_MD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1368,7 +1482,7 @@ AND NOT EXISTS (SELECT * FROM [DOC].[Calibration] AS T WHERE  T.id_metering_devi
 		   AND T.calibration_passed IS NULL)
 )
 GO
-/****** Object:  Table [DOC].[Responsible_persons]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Responsible_persons]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1383,7 +1497,7 @@ CREATE TABLE [DOC].[Responsible_persons](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Tasks_of_calibration]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Tasks_of_calibration]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1399,7 +1513,7 @@ CREATE TABLE [DOC].[Tasks_of_calibration](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Types_diagnostic_results]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Types_diagnostic_results]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1413,7 +1527,7 @@ CREATE TABLE [DOC].[Types_diagnostic_results](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Types_of_repairs]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Types_of_repairs]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1427,7 +1541,7 @@ CREATE TABLE [DOC].[Types_of_repairs](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [DOC].[Types_unserviceability]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [DOC].[Types_unserviceability]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1441,7 +1555,7 @@ CREATE TABLE [DOC].[Types_unserviceability](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [LOCATIONS].[Types_customers]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [LOCATIONS].[Types_customers]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1456,7 +1570,7 @@ CREATE TABLE [LOCATIONS].[Types_customers](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [MD].[Category]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [MD].[Category]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1470,7 +1584,7 @@ CREATE TABLE [MD].[Category](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [MD].[Types_metering_devices]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  Table [MD].[Types_metering_devices]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1649,7 +1763,7 @@ ALTER TABLE [MD].[Models]  WITH CHECK ADD  CONSTRAINT [CK_Models] CHECK  (([cali
 GO
 ALTER TABLE [MD].[Models] CHECK CONSTRAINT [CK_Models]
 GO
-/****** Object:  StoredProcedure [DOC].[Calibration_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Calibration_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1709,7 +1823,7 @@ INSERT INTO [DOC].[Calibration]
 		   ,@result_notes)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Calibration_ADD_NEW_ORDER]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Calibration_ADD_NEW_ORDER]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1747,7 +1861,7 @@ INSERT INTO [DOC].[Calibration]
 		   ,@comments)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Calibration_barcode_NOT_PASSED]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Calibration_barcode_NOT_PASSED]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1780,7 +1894,7 @@ UPDATE [DOC].[Calibration]
  WHERE [barcode]=@barcode
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Calibration_barcode_PASSED]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Calibration_barcode_PASSED]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1814,7 +1928,7 @@ UPDATE [DOC].[Calibration]
  WHERE [barcode]=@barcode
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Calibration_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Calibration_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1832,7 +1946,7 @@ DELETE FROM [DOC].[Calibration]
       WHERE [id_calibration] = @id_calibration
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Calibration_NOT_PASSED]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Calibration_NOT_PASSED]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1865,7 +1979,7 @@ UPDATE [DOC].[Calibration]
  WHERE [id_calibration]=@id_calibration
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Calibration_PASSED]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Calibration_PASSED]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1898,7 +2012,7 @@ UPDATE [DOC].[Calibration]
  WHERE [id_calibration]=@id_calibration
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Calibration_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Calibration_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1944,7 +2058,7 @@ UPDATE [DOC].[Calibration]
  WHERE [id_calibration]=@id_calibration
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Diagnostics_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Diagnostics_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1990,7 +2104,7 @@ INSERT INTO [DOC].[Diagnostics]
 			@notes)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Diagnostics_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Diagnostics_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2005,7 +2119,7 @@ BEGIN
 		WHERE [id_diagnostic]=@id_diagnostic
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Diagnostics_RETURN_MD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Diagnostics_RETURN_MD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2035,7 +2149,7 @@ SET NOCOUNT ON
 	WHERE [id_diagnostic]=@id_diagnostic
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Diagnostics_SEND_MD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Diagnostics_SEND_MD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2076,7 +2190,7 @@ INSERT INTO [DOC].[Diagnostics]
 			@comments)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Diagnostics_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Diagnostics_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2117,7 +2231,7 @@ BEGIN
 	WHERE [id_diagnostic]=@id_diagnostic
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Disposal_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Disposal_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2152,7 +2266,7 @@ BEGIN
            ,@comments)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Disposal_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Disposal_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2168,7 +2282,7 @@ BEGIN
 		WHERE [id_disposal]=@id_disposal
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Disposal_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Disposal_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2199,7 +2313,7 @@ BEGIN
 	WHERE [id_disposal]=@id_disposal
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Mounting_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Mounting_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2239,7 +2353,7 @@ BEGIN
 		   ,@id_metering_device)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Mounting_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Mounting_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2254,7 +2368,7 @@ BEGIN
 		WHERE [id_mounting]=@id_mounting
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Mounting_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Mounting_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2285,7 +2399,7 @@ UPDATE [DOC].[Mounting]
  WHERE [id_mounting]=@id_mounting
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Removal_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Removal_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2324,7 +2438,7 @@ INSERT INTO [DOC].[Removal]
            ,@comments)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Removal_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Removal_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2339,7 +2453,7 @@ BEGIN
 		WHERE [id_removal]=@id_removal
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Removal_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Removal_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2371,7 +2485,7 @@ UPDATE [DOC].[Removal]
  WHERE [id_removal]=@id_removal
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Repairs_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Repairs_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2427,7 +2541,7 @@ INSERT INTO [DOC].[Repairs]
 			@notes)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Repairs_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Repairs_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2442,7 +2556,7 @@ BEGIN
 		WHERE [id_repair]=@id_repair
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Repairs_RETURN_MD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Repairs_RETURN_MD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2474,7 +2588,7 @@ SET NOCOUNT ON
 	WHERE [id_repair]=@id_repair
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Repairs_SEND_MD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Repairs_SEND_MD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2516,7 +2630,7 @@ INSERT INTO [DOC].[Repairs]
 			@comments)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Repairs_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Repairs_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2559,7 +2673,7 @@ BEGIN
 	WHERE [id_repair]=@id_repair
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Responsible_persons_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Responsible_persons_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2578,7 +2692,7 @@ INSERT INTO [DOC].[Responsible_persons]
            ,@comments)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Responsible_persons_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Responsible_persons_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2593,7 +2707,7 @@ BEGIN
 		WHERE [id_responsible_person]=@id_responsible_person
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Responsible_persons_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Responsible_persons_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2612,7 +2726,7 @@ UPDATE [DOC].[Responsible_persons]
  WHERE [id_responsible_person]=@id_responsible_person
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Suppliers_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Suppliers_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2636,7 +2750,7 @@ INSERT INTO [DOC].[Suppliers]
 		   ,@contacts)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Suppliers_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Suppliers_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2652,7 +2766,7 @@ BEGIN
 		WHERE [id_supplier]=@id_supplier
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Suppliers_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Suppliers_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2675,7 +2789,7 @@ UPDATE [DOC].[Suppliers]
  WHERE [id_supplier]=@id_supplier
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Tasks_of_calibration_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Tasks_of_calibration_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2738,7 +2852,7 @@ DECLARE @doc_nom int = 1, @id_metering_device int, @id_location_metering_device 
 	END
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Tasks_of_calibration_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Tasks_of_calibration_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2754,7 +2868,7 @@ BEGIN
 		WHERE [id_task_of_calibration]=@id_task_of_calibration
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Tasks_of_calibration_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Tasks_of_calibration_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2774,7 +2888,7 @@ UPDATE [DOC].[Tasks_of_calibration]
  WHERE [id_task_of_calibration]=@id_task_of_calibration
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_diagnostic_results_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_diagnostic_results_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2791,7 +2905,7 @@ INSERT INTO [DOC].[Types_diagnostic_results]
            (@diagnostic_result)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_diagnostic_results_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_diagnostic_results_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2806,7 +2920,7 @@ BEGIN
 		WHERE [id_type_diagnostic_result]=@id_type_diagnostic_result
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_diagnostic_results_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_diagnostic_results_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2824,7 +2938,7 @@ UPDATE [DOC].[Types_diagnostic_results]
  WHERE [id_type_diagnostic_result]=@id_type_diagnostic_result
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_doc_calibrations_result_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_doc_calibrations_result_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2842,7 +2956,7 @@ INSERT INTO [DOC].[Types_doc_calibrations_result]
            (@type_doc_calibration_result)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_doc_calibrations_result_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_doc_calibrations_result_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2858,7 +2972,7 @@ BEGIN
 		WHERE [id_type_doc_calibration_result]=@id_type_doc_calibration_result
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_doc_calibrations_result_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_doc_calibrations_result_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2877,7 +2991,7 @@ UPDATE [DOC].[Types_doc_calibrations_result]
  WHERE [id_type_doc_calibration_result]=@id_type_doc_calibration_result
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_of_repairs_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_of_repairs_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2894,7 +3008,7 @@ INSERT INTO [DOC].[Types_of_repairs]
            (@type_of_repair)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_of_repairs_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_of_repairs_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2908,7 +3022,7 @@ BEGIN
 		WHERE [id_type_of_repair]=@id_type_of_repair
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_of_repairs_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_of_repairs_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2926,7 +3040,7 @@ UPDATE [DOC].[Types_of_repairs]
  WHERE [id_type_of_repair]=@id_type_of_repair
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_transactions_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_transactions_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2943,7 +3057,7 @@ INSERT INTO [DOC].[Types_transactions]
            (@type_transaction)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_transactions_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_transactions_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2958,7 +3072,7 @@ BEGIN
 		WHERE [id_type_transaction]=@id_type_transaction
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_transactions_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_transactions_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2976,7 +3090,7 @@ UPDATE [DOC].[Types_transactions]
  WHERE [id_type_transaction]=@id_type_transaction
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_unserviceability_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_unserviceability_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2992,7 +3106,7 @@ INSERT INTO [DOC].[Types_unserviceability]
            (@type_unserviceability)
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_unserviceability_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_unserviceability_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3007,7 +3121,7 @@ BEGIN
 		WHERE [id_type_unserviceability]=@id_type_unserviceability
 END
 GO
-/****** Object:  StoredProcedure [DOC].[Types_unserviceability_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [DOC].[Types_unserviceability_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3026,7 +3140,7 @@ UPDATE [DOC].[Types_unserviceability]
  WHERE [id_type_unserviceability]=@id_type_unserviceability
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Connection_points_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Connection_points_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3057,7 +3171,7 @@ INSERT INTO [LOCATIONS].[Connection_points]
            ,@adr)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Connection_points_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Connection_points_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3071,7 +3185,7 @@ SET NOCOUNT ON
 		WHERE [id_connection_point]=@id_connection_point
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Connection_points_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Connection_points_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3092,7 +3206,7 @@ UPDATE [LOCATIONS].[Connection_points]
  WHERE [id_connection_point]=@id_connection_point
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Customers_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Customers_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3118,7 +3232,7 @@ INSERT INTO [LOCATIONS].[Customers]
 		   ,@contacts)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Customers_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Customers_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3133,7 +3247,7 @@ BEGIN
 		WHERE [id_customer]=@id_customer
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Customers_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Customers_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3157,7 +3271,7 @@ UPDATE [LOCATIONS].[Customers]
  WHERE [id_customer]=@id_customer
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Delivery_points_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Delivery_points_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3174,7 +3288,7 @@ INSERT INTO [LOCATIONS].[Delivery_points]
            (@delivery_point)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Delivery_points_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Delivery_points_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3189,7 +3303,7 @@ BEGIN
 		WHERE [id_delivery_point]=@id_delivery_point
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Delivery_points_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Delivery_points_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3207,7 +3321,7 @@ UPDATE [LOCATIONS].[Delivery_points]
  WHERE [id_delivery_point]=@id_delivery_point
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[ENR_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[ENR_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3225,7 +3339,7 @@ INSERT INTO [LOCATIONS].[ENR]
            (@enr)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[ENR_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[ENR_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3239,7 +3353,7 @@ BEGIN
 		WHERE [id_enr]=@id_enr
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[ENR_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[ENR_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3257,7 +3371,7 @@ UPDATE [LOCATIONS].[ENR]
  WHERE [id_enr]=@id_enr
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Installation_sites_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Installation_sites_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3275,7 +3389,7 @@ INSERT INTO [LOCATIONS].[Installation_sites]
            (@installation_site)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Installation_sites_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Installation_sites_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3289,7 +3403,7 @@ BEGIN
 		WHERE [id_installation_site]=@id_installation_site
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Installation_sites_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Installation_sites_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3307,7 +3421,7 @@ UPDATE [LOCATIONS].[Installation_sites]
  WHERE [id_installation_site]=@id_installation_site
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Locations_metering_devices_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Locations_metering_devices_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3344,7 +3458,7 @@ INSERT INTO [LOCATIONS].[Locations_metering_devices]
            ,@comments)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Locations_metering_devices_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Locations_metering_devices_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3358,7 +3472,7 @@ BEGIN
 		WHERE [id_location_metering_device]=@id_location_metering_device
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Locations_metering_devices_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Locations_metering_devices_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3377,7 +3491,7 @@ UPDATE [LOCATIONS].[Locations_metering_devices]
  WHERE [id_location_metering_device]=@id_location_metering_device
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Regions_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Regions_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3393,7 +3507,7 @@ INSERT INTO [LOCATIONS].[Regions]
            (@region)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Regions_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Regions_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3408,7 +3522,7 @@ BEGIN
 		WHERE [id_region]=@id_region
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Regions_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Regions_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3426,7 +3540,7 @@ UPDATE [LOCATIONS].[Regions]
  WHERE [id_region]=@id_region
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Types_accounting_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Types_accounting_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3445,7 +3559,7 @@ INSERT INTO [LOCATIONS].[Types_accounting]
            (@type_accounting)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Types_accounting_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Types_accounting_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3460,7 +3574,7 @@ BEGIN
 		WHERE [id_type_accounting]=@id_type_accounting
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Types_accounting_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Types_accounting_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3478,7 +3592,7 @@ UPDATE [LOCATIONS].[Types_accounting]
  WHERE [id_type_accounting]=@id_type_accounting
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Types_customers_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Types_customers_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3498,7 +3612,7 @@ INSERT INTO [LOCATIONS].[Types_customers]
            (@type_customer, @comments)
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Types_customers_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Types_customers_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3513,7 +3627,7 @@ BEGIN
 		WHERE [id_type_customer]=@id_type_customer
 END
 GO
-/****** Object:  StoredProcedure [LOCATIONS].[Types_customers_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [LOCATIONS].[Types_customers_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3532,7 +3646,7 @@ UPDATE [LOCATIONS].[Types_customers]
  WHERE [id_type_customer]=@id_type_customer
 END
 GO
-/****** Object:  StoredProcedure [MD].[Category_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Category_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3550,7 +3664,7 @@ INSERT INTO [MD].[Category]
            (@category)
 END
 GO
-/****** Object:  StoredProcedure [MD].[Category_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Category_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3565,7 +3679,7 @@ BEGIN
 		WHERE [id_category]=@id_category
 END
 GO
-/****** Object:  StoredProcedure [MD].[Category_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Category_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3583,7 +3697,7 @@ UPDATE [MD].[Category]
  WHERE [id_category]=@id_category
 END
 GO
-/****** Object:  StoredProcedure [MD].[Metering_devices_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Metering_devices_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3611,7 +3725,7 @@ INSERT INTO [MD].[Metering_devices]
            (@id_model,@serial_number,@passport_number,@id_category,@id_type_metering_device,@nominal_value,@date_calibration,@comments,@barcode,@certificate)
 END
 GO
-/****** Object:  StoredProcedure [MD].[Metering_devices_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Metering_devices_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3625,7 +3739,7 @@ BEGIN
 		WHERE [id_metering_device]=@id_metering_devices
 END
 GO
-/****** Object:  StoredProcedure [MD].[Metering_devices_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Metering_devices_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3660,7 +3774,7 @@ UPDATE [MD].[Metering_devices]
  WHERE [id_metering_device]=@id_metering_device
 END
 GO
-/****** Object:  StoredProcedure [MD].[Models_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Models_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3680,7 +3794,7 @@ INSERT INTO [MD].[Models]
            (@model,@calibration_interval)
 END
 GO
-/****** Object:  StoredProcedure [MD].[Models_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Models_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3696,7 +3810,7 @@ BEGIN
 		WHERE [id_model]=@id_model
 END
 GO
-/****** Object:  StoredProcedure [MD].[Models_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Models_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3716,7 +3830,7 @@ UPDATE [MD].[Models]
  WHERE [id_model] = @id_model
 END
 GO
-/****** Object:  StoredProcedure [MD].[Types_metering_devices_ADD_NEW]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Types_metering_devices_ADD_NEW]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3734,7 +3848,7 @@ INSERT INTO [MD].[Types_metering_devices]
            (@type_metering_device)
 END
 GO
-/****** Object:  StoredProcedure [MD].[Types_metering_devices_DEL]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Types_metering_devices_DEL]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3749,7 +3863,7 @@ BEGIN
 		WHERE [id_type_metering_device]=@id_type_metering_device
 END
 GO
-/****** Object:  StoredProcedure [MD].[Types_metering_devices_UPD]    Script Date: 14.08.2021 1:27:23 ******/
+/****** Object:  StoredProcedure [MD].[Types_metering_devices_UPD]    Script Date: 14.08.2021 10:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
